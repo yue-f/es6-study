@@ -309,4 +309,128 @@ let b = 10;
 // // "OK"
 
 // 下面是一个更复杂的例子
-let
+// let total = 30;
+// let msg = passthru  `The total is ${total} (${total *1.05} with tax)`;
+
+// function passthru(literals) {
+//   let result = '';
+//   let i = 0;
+//   while(i < literals.length) {
+//     result += literals[i++];
+//     if(i < arguments.length) {
+//       result += arguments[i]
+//     }
+//   }
+//   return result;
+// }
+// console.log(msg)
+// 上面这个例子展示了，如何将各个参数按照原来的位置拼合回去
+
+// passthru函数采用rest参数的写法如下
+// function passthru(literals, ...values) {  
+//   console.log(literals)
+//   let output = '';
+//   let index;
+//   for(index = 0; index < values.length; index++) {
+//     // console.log('literals', literals, index, values)
+//     output += literals[index] + values[index];
+//   }
+//   output += literals[index]
+//   return output
+// }
+// console.log(msg) // The total is 30 (31.5 with tax)
+
+// “标签模板” 的一个重要应用，就是过滤HTML 字符串，防止用户输入恶意内容
+// let message = SaferHTML`<p>${sender} has sent you a message</p>`;
+
+// function SaferHTML(templateData) {
+//   let s = templateData[0];
+//   for(let i = 1; i < arguments.length; i++) {
+//     let arg = String(arguments[i]);
+
+//     s += arg.replace(/$/g, '&amp;')
+//             .replace(/</g, '&lt;')
+//             .replace(/>/g, '&gt;');
+//     s += templateData[i]
+//   }
+//   return s
+// }
+// // 上面代码中，sender变量往往是用户提供的，经过SaferHTML 喊出处理，里面的特殊字符都会被转义。
+// let sender = '<script>alert("abc")</script>'; // e恶意代码
+// let message = SaferHTML`<p>${sender} has sent you a message</p>`;
+// console.log(message); // <p>&lt;script&gt;alert("abc")&lt;/script&gt;&amp; has sent you a message</p>
+
+// 标签模板的另一个应用，就是多语言转换（国际化）
+// console.log(il8n`Welcome to ${siteName}, you are visitor number ${visitorNumber}!`)
+
+// 模板字符串本身并不能取代Mustache之类的模板库，因为没有条件判断和循环处理功能，但是通过标签函数，你可以自己添加这些功能
+// 下面hashTemplate函数， 是一个自定义的模板处理函数
+// let libraryHtml = hashTemplate`
+//   <ul>
+//     #for book in ${myBooks}
+//       <li>#{book.title}</i> by #{book.author}</li>
+//     #end
+//   </ul>
+// `;
+// 除此之外，伸直可以使用标签模板，在JavaScript 语言中嵌入其他语言。
+// jsx`
+//   <div>
+//     <input 
+//       ref='input'
+//       onChange='${this.handleChange}'
+//       defaultValue='${this.StaticRange.value}' />
+//       ${this.state.value}
+//   </div>
+// `
+// 上面代码通过jsx函数，将一个DOM字符串转为React对象。可以在GitHub找到jsx函数
+
+// 下面则是一个假想的例子，通过java函数，在 JavaScript 代码之中运行 Java 代码。
+// java`
+// class HelloWorldApp {
+//   public static void main(String[] args) {
+//     System.out.println("Hello World!"); // Display the string.
+//   }
+// }
+// `
+// HelloWorldApp.main();
+
+// 模板处理函数的第一个参数（模板字符串数组），还有一个raw属性。
+// console.log`123`
+// ["123", raw: Array[1]]
+// 上面代码中，console.log接受的参数，实际上是一个数组。该数组有一个raw属性，保存的是转义后的原字符串。
+
+// tag`First line\nSecond line`
+// function tag(strings) {
+//   console.log(strings.raw[0]); // First line\nSecond line
+// }
+// 上面代码中，tag函数的第一个参数strings，有一个raw属性，也指向一个数组。该数组的成员与strings数组完全一致。比如，strings数组是["First line\nSecond line"]，那么string.raw数组就是["First line\\nSecond line"]。 两者唯一的区别，就是字符串里面的斜杠都被转义了。比如，strings.raw 数组将会\n视为\\和n两个字符，而不是换行符。这是为了方便取得转义之前的原始模板而设计的
+
+
+/** 模板字符串的限制
+ *    前面提到标签模板里面，可以内嵌其他语言。但是模板字符串默认会将字符串转义，导致无法嵌入其他语言。
+ *    举例来说，标签模板里面可以嵌入LaTEX语言
+ */
+// function latex(strings) {  
+//   // ...
+// }
+// let document = latex`
+//   \newcommand{\fun}{\textbf{Fun!}} //正常工作
+//   \newcommand{\unicode}{\textbf{Unicode!}} // 报错
+//   \newcommand{\xerxes}{\textbf{King!}} // 报错
+
+//   Breve over the h goes \u{h}ere // 报错
+// `
+// 上面代码中，变量document 内嵌的模板字符串，对应LaTEX语言来说完全是合法的，但是JavaScript引擎会报错。原因就在于字符串的转义。
+
+// 模板字符串会将\u00FF 和 \u{42} 当做Unicode字符串进行转义，所以\unicode解析时会报错；而\x56会被当做十六进制字符串转义，所以\xerxes会报错。也就是说，\u 和 \x 在LaTEX里面有特殊含义，但是JavaScript将它们转义了
+
+// 为解决这个问题，es2018 放松了对标签模板里面的字符串转义的限制。如果遇到不符合的字符串转义，就返回undefined，而不是报错，并且从raw属性上面可以得到原始字符串
+// function tag(strs) {  
+//   strs[0] === undefined
+//   strs.raw[0] === '\\unicode and \\u{55}'
+// }
+// console.log(tag`\unicode and \u{55}`)
+// 上面代码中，木把你字符串原本是应该报错的，但是由于放松了字符串转义的限制，所以就不报错了，JavaScript引擎将第一个字符串设置为undefined，但是raw属性依然可以得到原始字符串，因此tag函数还是可以对原字符串进行处理。
+
+// 注意： 这种字符串转义的放松，只在标签模板解析字符串时生效，不是标签模板的场合，依然会报错
+// let bad = `bad escape sequence: \unicode`
