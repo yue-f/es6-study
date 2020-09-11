@@ -153,7 +153,64 @@
 // console.log('na'.repeat(-1)) // string-new-method.js:153 Uncaught RangeError: Invalid count value
 
 // 但是，如果参数是0 到 -1 之间的小数，则等同于-，这是因为会先进行取整运算。0 到 -1 之间的小数，取整以后等于-0，repeat视同为0。
-console.log('na'.repeat(-0.9))// ""
+// console.log('na'.repeat(-0.9))// ""
+// 参数NaN等同于0
+// console.log('na'.repeat(NaN)) // ""
+
+// 如果 repeat 的参数是字符，则会先转换成数字
+// console.log('na'.repeat('na')) // ""
+// console.log('na'.repeat('3')) // nanana
+
+/**　实例方法: padStart(), padEnd()
+ *    ES2017  引入了字符串补全长度的功能。如果某个字符串不够指定长度，会在头部或尾部补全。
+ *      padStart()： 用于头部补全，
+ *      padEnd():  用于尾部补全
+ */
+// console.log('x'.padStart(5, 'ab')) // ababx
+// console.log('x'.padStart(4, 'ab')) // abax
+
+// console.log('x'.padEnd(5, 'ab')) // xabab
+// console.log('x'.padEnd(4, 'ab')) // xaba
+
+// 上面代码中，padStart() 和 padEnd() 一共接受两个参数，第一个参数是字符串补全生效的最大长度，第二个参数是用来补全的字符串
+
+// 如果原来字符串的长度， 等于 或大于最大长度，则字符串补全不生效，返回原来字符串。
+// console.log('xxx'.padStart(2, 'ab')) // xxx
+// console.log('xxx'.padEnd(2, 'ab')) // xxx
+
+// 如果用来补全的字符串与原来的字符串，两者的长度之和超过了最大长度，则会截去超出位数的补全字符串
+// console.log('abc'.padStart(10, '1023456789')) // 1023456abc
+
+// 如果省略第二个参数，默认使用空格补全长度
+// console.log('x'.padStart(5)) // '    x'
+// console.log('x'.padEnd(5)) // 'x    '
+
+// padStart() 的常见用途是为了数值补全指定位数。下面代码生成10位的数值字符串
+// console.log('1'.padStart(10, '0')) // 0000000001
+// console.log('12'.padStart(10, '0')) // 0000000012
+// console.log('123456'.padStart(10, '0')) // 0000123456
+
+// 另一个用途是提示字符串格式
+// console.log('12'.padStart(10, 'YYYY-MM-DD')) // YYYY-MM-12
+// console.log('09-12'.padStart(10, 'YYYY-MM-DD')) // YYYY-09-12
+
+/** 实例方法： trimStart(), trimEnd()
+ *    ES2019 对字符串实例新增了trimStart() 和 trimEnd() 这两个方法。它们的行为与trim一致。
+ *    trimStart(): 消除字符串头部的空格
+ *    trimEnd(): 消除字符串尾部的空格。
+ *  它们返回的都是新字符串，不会改变原始字符串
+ */
+// const s = '   abc   ';
+// console.log(s.trim()) // 'abc'
+// console.log(s.trimStart()) // 'abc   '
+// console.log(s.trimEnd()) // '   abc'
+
+// 上面代码中，trimStart() 只能消除头部的空格，保留尾部的空格。trimEnd() 也是类似行为。
+// 除了空格键，这两个方法对字符串头部（或尾部）的tab键、换行符等都不可见的空白符号也有效
+
+// 浏览器还部署了额外的两个方法，trimLeft() 和 trimStart()的别名，trimRight() 是 trimEnd()的别名
 
 
-
+/**实例方法： matchAll()
+ *    macthAll() 方法返回一个正则表达式在当前字符串的所有匹配。
+ */
