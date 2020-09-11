@@ -263,3 +263,6 @@
 // 下面的例子是使用后行断言进行字符串替换
 // const RE_DOLLAR_PREFIX = /(?<=\$)foo/g;
 // console.log('$foo %foo foo'.replace(RE_DOLLAR_PREFIX, 'bar')) // $bar %foo foo
+// 上面代码中，只有在美元符号后面的foo 才会被替换。
+
+// “后行断言”的实现，需要先匹配/(?<=y)x/的x
